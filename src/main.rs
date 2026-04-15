@@ -1,7 +1,5 @@
 use std::{
-    fs::File,
-    io::{BufRead, BufReader, stdin},
-    process::exit,
+    fs::File, io::{BufRead, BufReader, stdin}, process::exit
 };
 
 use unicode_normalization::UnicodeNormalization;
@@ -11,7 +9,13 @@ fn main() {
     let target = prompt_target();
 
     // Read all the words from a textfile
-    let wordlist = get_wordlist("wordlist.txt");
+    let wordlist = match get_wordlist("wordlist.txt") {
+        Ok(list) => list, 
+        Err(err) => {
+            eprint!("{err}");
+            exit(1)
+        }
+    };
 
     // Check target against wordlist to find matches
     for word in wordlist {
@@ -36,25 +40,27 @@ fn prompt_target() -> String {
 }
 
 /// Extracts all the words from a *.txt file
-fn get_wordlist(filename: &str) -> Vec<String> {
+fn get_wordlist(filename: &str) -> Result<Vec<String>, &'static str> {
     let reader = match File::open(filename) {
-        Err(msg) => {
-            eprintln!("Couldn't read database with words: {msg}");
-            exit(1)
+        Err(err) => {
+            eprintln!("Couldn't read database with words: {err}");
+            return Err("{err}")
         }
         Ok(file) => BufReader::new(file),
     };
 
-    reader
-        .lines()
-        .map(|line| match line {
-            Ok(line) => line,
-            Err(msg) => {
-                eprintln!("{msg}");
-                exit(1);
-            }
-        })
-        .collect()
+    Ok(
+        reader
+            .lines()
+            .filter_map(|line| match line {
+                Ok(line) => Some(line),
+                Err(msg) => {
+                    eprintln!("{msg}");
+                    None
+                }
+            })
+            .collect()
+    )
 }
 
 trait StrExt {
@@ -82,10 +88,7 @@ impl StrExt for str {
 
         // Once we have determined that the length is the same,
         // check the pattern
-        let target = target.chars();
-        let reference = reference.chars();
-
-        for (t, r) in target.zip(reference) {
+        for (t, r) in target.chars().zip(reference.chars()) {
             if t == '*' {
                 continue;
             }
