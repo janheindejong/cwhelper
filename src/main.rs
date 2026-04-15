@@ -30,7 +30,7 @@ fn main() {
     };
 
     // Read all the words from a textfile
-    let lexicon = match load_lexicon(args.lexicon.to_str().expect("Incorrectly formatted path")) {
+    let lexicon = match load_lexicon(&args.lexicon) {
         Ok(list) => list,
         Err(err) => {
             eprintln!("{err}");
@@ -60,7 +60,7 @@ fn prompt_target() -> String {
 }
 
 /// Extracts all the words from a *.txt file
-fn load_lexicon(filename: &str) -> Result<Vec<String>, io::Error> {
+fn load_lexicon(filename: &PathBuf) -> Result<Vec<String>, io::Error> {
     let reader = BufReader::new(File::open(filename)?);
 
     let wordlist = reader
