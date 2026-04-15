@@ -9,7 +9,7 @@ fn main() {
     let target = prompt_target();
 
     // Read all the words from a textfile
-    let wordlist = match get_wordlist("wordlist.txt") {
+    let lexicon = match load_lexicon("wordlist.txt") {
         Ok(list) => list, 
         Err(err) => {
             eprint!("{err}");
@@ -17,11 +17,12 @@ fn main() {
         }
     };
 
-    // Check target against wordlist to find matches
-    for word in wordlist {
-        if target.would_match(&word) {
-            println!("{word}")
-        }
+    let possible_matches = lexicon
+        .iter()
+        .filter(|word| target.would_match(&word));
+
+    for word in possible_matches {
+        println!("{word}")
     }
 }
 
@@ -40,7 +41,7 @@ fn prompt_target() -> String {
 }
 
 /// Extracts all the words from a *.txt file
-fn get_wordlist(filename: &str) -> Result<Vec<String>, io::Error> {
+fn load_lexicon(filename: &str) -> Result<Vec<String>, io::Error> {
     let reader = BufReader::new(File::open(filename)?);
 
     let wordlist = reader
