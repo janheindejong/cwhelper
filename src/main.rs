@@ -12,7 +12,7 @@ use unicode_normalization::UnicodeNormalization;
 fn main() {
     let args = Args::parse();
 
-    // Query the user for a target in the form 'app*l'
+    // Get target in the form 'app*l'
     let target = match args.word {
         Some(word) => word,
         None => prompt_target(),
