@@ -1,5 +1,8 @@
 use std::{
-    fs::File, io::{self, BufRead, BufReader, stdin}, path::PathBuf, process::exit
+    fs::File,
+    io::{self, BufRead, BufReader, stdin},
+    path::PathBuf,
+    process::exit,
 };
 
 use clap::Parser;
@@ -7,27 +10,24 @@ use clap::Parser;
 use unicode_normalization::UnicodeNormalization;
 
 fn main() {
-
     let args = Args::parse();
 
     // Query the user for a target in the form 'app*l'
     let target = match args.word {
         Some(word) => word,
-        None => prompt_target()
+        None => prompt_target(),
     };
 
     // Read all the words from a textfile
     let lexicon = match load_lexicon(args.lexicon.to_str().expect("Uh-oh")) {
-        Ok(list) => list, 
+        Ok(list) => list,
         Err(err) => {
             eprintln!("{err}");
             exit(1)
         }
     };
 
-    let possible_matches = lexicon
-        .iter()
-        .filter(|word| target.would_match(&word));
+    let possible_matches = lexicon.iter().filter(|word| target.would_match(&word));
 
     for word in possible_matches {
         println!("{word}")
@@ -107,11 +107,10 @@ impl StrExt for str {
     }
 }
 
-
 #[derive(Parser)]
 struct Args {
     word: Option<String>,
 
-    #[arg(short, long, value_name = "FILE", default_value="wordlist.txt")]
+    #[arg(short, long, value_name = "FILE", default_value = "wordlist.txt")]
     lexicon: PathBuf,
 }
