@@ -1,18 +1,26 @@
 use std::{
-    fs::File, io::{self, BufRead, BufReader, stdin}, process::exit
+    fs::File, io::{self, BufRead, BufReader, stdin}, path::PathBuf, process::exit
 };
+
+use clap::Parser;
 
 use unicode_normalization::UnicodeNormalization;
 
 fn main() {
+
+    let args = Args::parse();
+
     // Query the user for a target in the form 'app*l'
-    let target = prompt_target();
+    let target = match args.word {
+        Some(word) => word,
+        None => prompt_target()
+    };
 
     // Read all the words from a textfile
-    let lexicon = match load_lexicon("wordlist.txt") {
+    let lexicon = match load_lexicon(args.lexicon.to_str().expect("Uh-oh")) {
         Ok(list) => list, 
         Err(err) => {
-            eprint!("{err}");
+            eprintln!("{err}");
             exit(1)
         }
     };
@@ -97,4 +105,13 @@ impl StrExt for str {
 
         true
     }
+}
+
+
+#[derive(Parser)]
+struct Args {
+    word: Option<String>,
+
+    #[arg(short, long, value_name = "FILE", default_value="wordlist.txt")]
+    lexicon: PathBuf,
 }
