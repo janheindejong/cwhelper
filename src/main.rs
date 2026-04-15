@@ -9,6 +9,17 @@ use clap::Parser;
 
 use unicode_normalization::UnicodeNormalization;
 
+/// Tool to help you solve the NRC Econogram
+#[derive(Parser)]
+struct Args {
+    /// Word to match against lexicon (e.g., c*fe or pat*tzaak)
+    word: Option<String>,
+
+    /// Path to lexicon file, where each line is a word
+    #[arg(short, long, value_name = "FILE", default_value = "wordlist.txt")]
+    lexicon: PathBuf,
+}
+
 fn main() {
     let args = Args::parse();
 
@@ -105,12 +116,4 @@ impl StrExt for str {
 
         true
     }
-}
-
-#[derive(Parser)]
-struct Args {
-    word: Option<String>,
-
-    #[arg(short, long, value_name = "FILE", default_value = "wordlist.txt")]
-    lexicon: PathBuf,
 }
