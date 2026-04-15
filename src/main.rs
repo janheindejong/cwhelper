@@ -1,5 +1,5 @@
 use std::{
-    fs::File, io::{BufRead, BufReader, stdin}, process::exit
+    fs::File, io::{self, BufRead, BufReader, stdin}, process::exit
 };
 
 use unicode_normalization::UnicodeNormalization;
@@ -40,27 +40,21 @@ fn prompt_target() -> String {
 }
 
 /// Extracts all the words from a *.txt file
-fn get_wordlist(filename: &str) -> Result<Vec<String>, &'static str> {
-    let reader = match File::open(filename) {
-        Err(err) => {
-            eprintln!("Couldn't read database with words: {err}");
-            return Err("{err}")
-        }
-        Ok(file) => BufReader::new(file),
-    };
+fn get_wordlist(filename: &str) -> Result<Vec<String>, io::Error> {
+    let reader = BufReader::new(File::open(filename)?);
 
-    Ok(
-        reader
-            .lines()
-            .filter_map(|line| match line {
-                Ok(line) => Some(line),
-                Err(msg) => {
-                    eprintln!("{msg}");
-                    None
-                }
-            })
-            .collect()
-    )
+    let wordlist = reader
+        .lines()
+        .filter_map(|line| match line {
+            Ok(line) => Some(line),
+            Err(msg) => {
+                eprintln!("{msg}");
+                None
+            }
+        })
+        .collect();
+
+    Ok(wordlist)
 }
 
 trait StrExt {
