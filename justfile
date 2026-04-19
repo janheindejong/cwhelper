@@ -1,4 +1,10 @@
-build: 
+lint: 
+    cargo fmt --check
+
+check: lint
+    cargo test --lib
+
+build: check 
     cargo build --release
 
 try: build

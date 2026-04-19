@@ -72,7 +72,7 @@ mod tests {
     fn target_should_match() {
         let lexicon = lexicon();
         let res = lexicon.find_matches("car****");
-        assert_eq!(res.len(), 2)
+        assert_eq!(res.len(), 2);
     }
 
     #[test]
@@ -80,6 +80,7 @@ mod tests {
         let lexicon = lexicon();
         let res = lexicon.find_matches("c*fe");
         assert_eq!(res.len(), 1);
+        assert_eq!(res[0], "café");
     }
 
     #[test]
@@ -87,5 +88,6 @@ mod tests {
         let lexicon = lexicon();
         let res = lexicon.find_matches("c*rtEr");
         assert_eq!(res.len(), 1);
+        assert_eq!(res[0], "Carter");
     }
 }
