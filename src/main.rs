@@ -1,9 +1,4 @@
-use std::{
-    fs::File,
-    io::{self, BufRead, BufReader, stdin},
-    path::PathBuf,
-    process::exit,
-};
+use std::{io::stdin, path::PathBuf, process::exit};
 
 use clap::Parser;
 
@@ -12,12 +7,41 @@ use econogram_helper::Lexicon;
 /// Tool to help you solve the NRC Econogram
 #[derive(Parser)]
 struct Args {
-    /// Word to match against lexicon (e.g., c*fe or pat*tzaak)
+    /// Word to match against lexicon (e.g., c*fe or pat*tzaak); if not passed, user is prompted
     word: Option<String>,
 
-    /// Path to lexicon file, where each line is a word
-    #[arg(short, long, value_name = "FILE", default_value = "wordlist.txt")]
-    lexicon: PathBuf,
+    /// Optional path to lexicon file, where each line is a word
+    #[arg(short, long, value_name = "FILE")]
+    lexicon: Option<PathBuf>,
+}
+
+fn main() {
+    let args = Args::parse();
+
+    // Get target in the form 'app*l'
+    let target = match args.word {
+        Some(word) => word,
+        None => prompt_target(),
+    };
+
+    let lexicon = match &args.lexicon {
+        // If lexicon is passed as argument, load from file
+        Some(path) => match Lexicon::from_file(path) {
+            Ok(lexicon) => lexicon,
+            Err(err) => {
+                eprintln!("Couldn't read lexicon: {err}");
+                exit(1)
+            }
+        },
+        // By default, use Dutch lexicon
+        None => Lexicon::dutch(),
+    };
+
+    let possible_matches = lexicon.find_matches(&target);
+
+    for word in possible_matches {
+        println!("{word}")
+    }
 }
 
 /// Gets the target string from the CLI
@@ -31,48 +55,5 @@ fn prompt_target() -> String {
             continue;
         }
         break input.trim().to_string();
-    }
-}
-
-/// Extracts all the words from a *.txt file
-fn load_lexicon(filename: &PathBuf) -> Result<Lexicon, io::Error> {
-    let reader = BufReader::new(File::open(filename)?);
-
-    let words = reader
-        .lines()
-        .filter_map(|line| match line {
-            Ok(line) => Some(line),
-            Err(msg) => {
-                eprintln!("{msg}");
-                None
-            }
-        })
-        .collect();
-
-    Ok(Lexicon::new(words))
-}
-
-fn main() {
-    let args = Args::parse();
-
-    // Get target in the form 'app*l'
-    let target = match args.word {
-        Some(word) => word,
-        None => prompt_target(),
-    };
-
-    // Read all the words from a textfile
-    let lexicon = match load_lexicon(&args.lexicon) {
-        Ok(list) => list,
-        Err(err) => {
-            eprintln!("{err}");
-            exit(1)
-        }
-    };
-
-    let possible_matches = lexicon.find_matches(&target);
-
-    for word in possible_matches {
-        println!("{word}")
     }
 }

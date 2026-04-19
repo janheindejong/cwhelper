@@ -1,3 +1,6 @@
+fmt: 
+    cargo fmt
+
 lint: 
     cargo fmt --check
 
@@ -8,4 +11,4 @@ build: check
     cargo build --release
 
 try: build
-    ./target/release/econogram-helper t*st --lexicon wordlist.txt
+    ./target/release/econogram-helper t*st

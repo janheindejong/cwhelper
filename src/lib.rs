@@ -1,3 +1,9 @@
+use std::{
+    fs::File,
+    io::{self, BufRead, BufReader},
+    path::PathBuf,
+};
+
 use unicode_normalization::UnicodeNormalization;
 
 pub struct Lexicon {
@@ -5,8 +11,33 @@ pub struct Lexicon {
 }
 
 impl Lexicon {
-    pub fn new(words: Vec<String>) -> Self {
+    pub fn from_words(words: Vec<String>) -> Self {
         Lexicon { words }
+    }
+
+    pub fn dutch() -> Self {
+        let words = include_str!("dutch.txt")
+            .split('\n')
+            .map(|x| x.to_string())
+            .collect();
+        Lexicon { words }
+    }
+
+    pub fn from_file(filename: &PathBuf) -> Result<Self, io::Error> {
+        let reader = BufReader::new(File::open(filename)?);
+
+        let words = reader
+            .lines()
+            .filter_map(|line| match line {
+                Ok(line) => Some(line),
+                Err(msg) => {
+                    eprintln!("{msg}");
+                    None
+                }
+            })
+            .collect();
+
+        Ok(Lexicon::from_words(words))
     }
 
     pub fn find_matches(&self, target: &str) -> Vec<&String> {
@@ -62,7 +93,7 @@ impl StrExt for str {
 mod tests {
     use super::*;
 
-    fn lexicon() -> Lexicon {
+    fn simple_lexicon() -> Lexicon {
         let words = vec!["café", "carpool", "carport", "brick", "carpenter", "Carter"];
         let words = words.iter().map(|w| w.to_string()).collect();
         Lexicon { words }
@@ -70,14 +101,14 @@ mod tests {
 
     #[test]
     fn target_should_match() {
-        let lexicon = lexicon();
+        let lexicon = simple_lexicon();
         let res = lexicon.find_matches("car****");
         assert_eq!(res.len(), 2);
     }
 
     #[test]
     fn diacritics_should_be_ignored() {
-        let lexicon = lexicon();
+        let lexicon = simple_lexicon();
         let res = lexicon.find_matches("c*fe");
         assert_eq!(res.len(), 1);
         assert_eq!(res[0], "café");
@@ -85,9 +116,24 @@ mod tests {
 
     #[test]
     fn capitals_should_be_ignored() {
-        let lexicon = lexicon();
+        let lexicon = simple_lexicon();
         let res = lexicon.find_matches("c*rtEr");
         assert_eq!(res.len(), 1);
         assert_eq!(res[0], "Carter");
+    }
+
+    #[test]
+    fn dutch_lexicon_has_413938_words() {
+        let lexicon = Lexicon::dutch();
+        assert_eq!(lexicon.words.len(), 413938);
+    }
+
+    #[test]
+    fn dutch_actiecom_finds_2_matches() {
+        let lexicon = Lexicon::dutch();
+        let matches = lexicon.find_matches("actiecom***");
+        assert_eq!(matches.len(), 2);
+        assert_eq!(matches[0], "actiecomedy");
+        assert_eq!(matches[1], "actiecomité");
     }
 }
