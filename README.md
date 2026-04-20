@@ -6,8 +6,8 @@ A little tool to help you when you get stuck with a crossword puzzle.
 
 The logic can be accessed in two ways: 
 
-* *cli*: cargo run --bin cwhelper -- "t*st"
-* *web*: cargo run --bin web
+* **As a CLI**: `just run "c*fe"`
+* **As a web-service**: `just run-web`
 
 For more commands, see the [justfile](./justfile).
 
