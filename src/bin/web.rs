@@ -63,7 +63,7 @@ async fn find_matches(
         "Extracted {} matche(s) for '{}' from {} in {:?}.",
         matches.len(),
         &params.word,
-        &params.language, 
+        &params.language,
         Instant::now() - start
     );
     Ok(Json(MatchesResponse { matches }))

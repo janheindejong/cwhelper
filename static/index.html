@@ -18,7 +18,6 @@
       --mono:    'DM Mono', monospace;
       --serif:   'Fraunces', serif;
 
-      /* responsive spacing tokens */
       --pad-x:  clamp(1.25rem, 5vw, 3rem);
       --pad-y:  clamp(1.5rem, 4vw, 2.5rem);
     }
@@ -64,7 +63,6 @@
       padding-left: 1.25rem;
     }
 
-    /* on very small screens, drop the left border and let the tagline wrap */
     @media (max-width: 480px) {
       header {
         flex-direction: column;
@@ -89,13 +87,11 @@
       max-width: 1100px;
     }
 
-    /* stack to single column below 640 px */
     @media (max-width: 640px) {
       main {
         grid-template-columns: 1fr;
       }
     }
-
 
     /* ── input panel ── */
     .input-panel h2 {
@@ -118,7 +114,7 @@
 
     .word-input-wrap {
       position: relative;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .word-input-wrap::before {
@@ -144,15 +140,11 @@
       outline: none;
       transition: border-color 0.15s;
       letter-spacing: 0.05em;
-      /* prevent iOS zoom on focus (font-size >= 16px) */
       -webkit-text-size-adjust: 100%;
     }
 
-    /* bump to 16 px on mobile to avoid iOS auto-zoom */
     @media (max-width: 640px) {
-      #word-input {
-        font-size: 1rem;
-      }
+      #word-input { font-size: 1rem; }
     }
 
     #word-input:focus {
@@ -161,6 +153,44 @@
 
     #word-input::placeholder {
       color: var(--border);
+    }
+
+    /* ── language select ── */
+    .select-wrap {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #language-select {
+      width: 100%;
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--ink);
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    #language-select:focus {
+      border-color: var(--ink);
     }
 
     button {
@@ -174,7 +204,6 @@
       border: none;
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
-      /* full-width on mobile for easier tapping */
       width: 100%;
     }
 
@@ -193,7 +222,6 @@
 
     /* ── results panel ── */
     .results-panel {
-      /* side border only on two-column layout */
       border-left: 1px solid var(--border);
       padding-left: clamp(1.25rem, 3vw, 3rem);
     }
@@ -304,6 +332,12 @@
         spellcheck="false"
       />
     </div>
+    <div class="select-wrap">
+      <select id="language-select">
+        <option value="Dutch">Nederlands</option>
+        <option value="English">Engels</option>
+      </select>
+    </div>
     <button id="search-btn">Zoek</button>
   </section>
 
@@ -322,11 +356,12 @@
 <script>
   const API_BASE = window.location.origin;
 
-  const input     = document.getElementById('word-input');
-  const btn       = document.getElementById('search-btn');
-  const status    = document.getElementById('status');
-  const list      = document.getElementById('results-list');
-  const countEl   = document.getElementById('result-count');
+  const input       = document.getElementById('word-input');
+  const langSelect  = document.getElementById('language-select');
+  const btn         = document.getElementById('search-btn');
+  const status      = document.getElementById('status');
+  const list        = document.getElementById('results-list');
+  const countEl     = document.getElementById('result-count');
   const footerCount = document.getElementById('footer-count');
 
   async function search() {
@@ -341,7 +376,11 @@
     footerCount.textContent = '';
 
     try {
-      const res = await fetch(`${API_BASE}/matches?word=${encodeURIComponent(word)}`);
+      const params = new URLSearchParams({
+        word,
+        language: langSelect.value,
+      });
+      const res = await fetch(`${API_BASE}/matches?${params}`);
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
       const { matches } = await res.json();
