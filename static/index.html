@@ -17,6 +17,10 @@
       --border:  #c8bfb0;
       --mono:    'DM Mono', monospace;
       --serif:   'Fraunces', serif;
+
+      /* responsive spacing tokens */
+      --pad-x:  clamp(1.25rem, 5vw, 3rem);
+      --pad-y:  clamp(1.5rem, 4vw, 2.5rem);
     }
 
     body {
@@ -26,23 +30,24 @@
       min-height: 100vh;
       display: grid;
       grid-template-rows: auto 1fr auto;
-      padding: 0;
     }
 
     /* ── header ── */
     header {
       border-bottom: 1px solid var(--border);
-      padding: 2.5rem 3rem 2rem;
+      padding: var(--pad-y) var(--pad-x);
       display: flex;
       align-items: baseline;
-      gap: 1.5rem;
+      gap: 1.25rem;
+      flex-wrap: wrap;
     }
 
     header h1 {
-      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-size: clamp(1.5rem, 5vw, 2.4rem);
       font-weight: 700;
       letter-spacing: -0.02em;
       line-height: 1;
+      white-space: nowrap;
     }
 
     header h1 em {
@@ -51,23 +56,46 @@
     }
 
     header p {
-      font-size: 0.95rem;
+      font-size: clamp(0.8rem, 2.5vw, 0.95rem);
       font-weight: 300;
       color: var(--muted);
       font-style: italic;
       border-left: 1px solid var(--border);
-      padding-left: 1.5rem;
+      padding-left: 1.25rem;
+    }
+
+    /* on very small screens, drop the left border and let the tagline wrap */
+    @media (max-width: 480px) {
+      header {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      header p {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid var(--border);
+        padding-top: 0.6rem;
+        width: 100%;
+      }
     }
 
     /* ── main ── */
     main {
-      padding: 3rem;
+      padding: var(--pad-y) var(--pad-x);
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 3rem;
+      gap: clamp(1.5rem, 4vw, 3rem);
       align-items: start;
       max-width: 1100px;
     }
+
+    /* stack to single column below 640 px */
+    @media (max-width: 640px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
 
     /* ── input panel ── */
     .input-panel h2 {
@@ -85,6 +113,7 @@
       color: var(--muted);
       margin-bottom: 1rem;
       font-style: italic;
+      line-height: 1.5;
     }
 
     .word-input-wrap {
@@ -108,13 +137,22 @@
       width: 100%;
       padding: 0.85rem 1rem 0.85rem 2.2rem;
       font-family: var(--mono);
-      font-size: 1.15rem;
+      font-size: clamp(1rem, 4vw, 1.15rem);
       background: transparent;
       border: 1px solid var(--border);
       color: var(--ink);
       outline: none;
       transition: border-color 0.15s;
       letter-spacing: 0.05em;
+      /* prevent iOS zoom on focus (font-size >= 16px) */
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* bump to 16 px on mobile to avoid iOS auto-zoom */
+    @media (max-width: 640px) {
+      #word-input {
+        font-size: 1rem;
+      }
     }
 
     #word-input:focus {
@@ -136,6 +174,12 @@
       border: none;
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
+      /* full-width on mobile for easier tapping */
+      width: 100%;
+    }
+
+    @media (min-width: 641px) {
+      button { width: auto; }
     }
 
     button:hover {
@@ -149,8 +193,22 @@
 
     /* ── results panel ── */
     .results-panel {
+      /* side border only on two-column layout */
       border-left: 1px solid var(--border);
-      padding-left: 3rem;
+      padding-left: clamp(1.25rem, 3vw, 3rem);
+    }
+
+    @media (max-width: 640px) {
+      main {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+      .results-panel {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        padding-left: 0;
+        padding-top: 1.25rem;
+      }
     }
 
     .results-panel h2 {
@@ -184,7 +242,7 @@
 
     #results-list li {
       font-family: var(--mono);
-      font-size: 1rem;
+      font-size: clamp(0.9rem, 3vw, 1rem);
       padding: 0.35rem 0;
       border-bottom: 1px solid transparent;
       transition: border-color 0.1s, color 0.1s;
@@ -203,7 +261,6 @@
       to   { opacity: 1; transform: translateX(0); }
     }
 
-    /* stagger children */
     #results-list li:nth-child(1)  { animation-delay: 0ms; }
     #results-list li:nth-child(2)  { animation-delay: 30ms; }
     #results-list li:nth-child(3)  { animation-delay: 60ms; }
@@ -214,12 +271,14 @@
     /* ── footer ── */
     footer {
       border-top: 1px solid var(--border);
-      padding: 1rem 3rem;
+      padding: 1rem var(--pad-x);
       font-family: var(--mono);
       font-size: 0.7rem;
       color: var(--border);
       display: flex;
       justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
   </style>
 </head>
@@ -240,6 +299,8 @@
         type="text"
         placeholder="kof*ie"
         autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
         spellcheck="false"
       />
     </div>
@@ -248,14 +309,14 @@
 
   <section class="results-panel">
     <h2>Resultaten (<span id="result-count">0 matches</span>)</h2>
-    <p id="status">Voeg een woord in om te zoeken.</p>
+    <p id="status">Voer een woord in om te zoeken.</p>
     <ul id="results-list"></ul>
   </section>
 </main>
 
 <footer>
   <span>Crossword Helper</span>
-  <span id="result-count"></span>
+  <span id="footer-count"></span>
 </footer>
 
 <script>
@@ -266,6 +327,7 @@
   const status    = document.getElementById('status');
   const list      = document.getElementById('results-list');
   const countEl   = document.getElementById('result-count');
+  const footerCount = document.getElementById('footer-count');
 
   async function search() {
     const word = input.value.trim();
@@ -276,6 +338,7 @@
     status.textContent = 'Searching…';
     list.innerHTML = '';
     countEl.textContent = '';
+    footerCount.textContent = '';
 
     try {
       const res = await fetch(`${API_BASE}/matches?word=${encodeURIComponent(word)}`);
@@ -284,19 +347,22 @@
       const { matches } = await res.json();
 
       if (matches.length === 0) {
-        status.textContent = 'No matches found.';
+        status.textContent = 'Geen matches gevonden.';
+        countEl.textContent = '0 matches';
       } else {
         status.textContent = '';
-        matches.forEach(word => {
+        matches.forEach(w => {
           const li = document.createElement('li');
-          li.textContent = word;
+          li.textContent = w;
           list.appendChild(li);
         });
-        countEl.textContent = `${matches.length} match${matches.length !== 1 ? 'es' : ''}`;
+        const label = `${matches.length} match${matches.length !== 1 ? 'es' : ''}`;
+        countEl.textContent = label;
+        footerCount.textContent = label;
       }
     } catch (err) {
       status.className = 'error';
-      status.textContent = `Error: ${err.message}`;
+      status.textContent = `Fout: ${err.message}`;
     } finally {
       btn.disabled = false;
     }
