@@ -49,7 +49,7 @@ impl Lexicon {
     }
 }
 
-trait StrExt {
+trait StringMatching {
     /// Removes accents etc from string, e.g. turning café into cafe
     fn strip_diacritics(&self) -> String;
 
@@ -57,7 +57,7 @@ trait StrExt {
     fn would_match(&self, other: &str) -> bool;
 }
 
-impl StrExt for str {
+impl StringMatching for str {
     fn strip_diacritics(&self) -> String {
         self.nfd().filter(|c| c.is_ascii()).collect()
     }
