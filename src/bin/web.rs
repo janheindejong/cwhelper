@@ -5,7 +5,7 @@ use axum::{
     response::{Html, Json},
     routing::get,
 };
-use econogram_helper::Lexicon;
+use cwhelper::Lexicon;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 

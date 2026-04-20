@@ -2,7 +2,7 @@ use std::{io::stdin, path::PathBuf, process::exit};
 
 use clap::Parser;
 
-use econogram_helper::Lexicon;
+use cwhelper::Lexicon;
 
 /// Tool to help you solve the NRC Econogram
 #[derive(Parser)]
