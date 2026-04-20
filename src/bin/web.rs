@@ -7,18 +7,41 @@ use axum::{
 };
 use cwhelper::Lexicon;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
-// Shared state: load the lexicon once at startup
 struct AppState {
-    lexicon: Lexicon,
+    lexicons: HashMap<Language, Lexicon>,
+}
+
+#[derive(Deserialize, PartialEq, Eq, Hash)]
+enum Language {
+    English,
+    Dutch,
+}
+
+impl std::fmt::Display for Language {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            Language::Dutch => "Dutch",
+            Language::English => "English",
+        };
+        write!(f, "{s}")
+    }
 }
 
 #[derive(Deserialize)]
 struct WordQuery {
     word: String,
+    #[serde(default)]
+    language: Language,
+}
+
+impl Default for Language {
+    fn default() -> Self {
+        Self::Dutch
+    }
 }
 
 #[derive(Serialize)]
@@ -34,8 +57,13 @@ async fn find_matches(
     State(state): State<Arc<AppState>>,
     Query(params): Query<WordQuery>,
 ) -> Result<Json<MatchesResponse>, (StatusCode, String)> {
-    let matches = state.lexicon.find_matches(&params.word);
-    info!("Found {} matches for query {}", matches.len(), &params.word);
+    let matches = state.lexicons[&params.language].find_matches(&params.word);
+    info!(
+        "Found {} matches for query '{}' in {}",
+        matches.len(),
+        &params.word,
+        &params.language
+    );
     Ok(Json(MatchesResponse { matches }))
 }
 
@@ -52,8 +80,12 @@ fn setup_logging() {
 async fn main() {
     setup_logging();
 
-    let lexicon = Lexicon::dutch();
-    let state = Arc::new(AppState { lexicon });
+    let lexicons = HashMap::from([
+        (Language::Dutch, Lexicon::dutch()),
+        (Language::English, Lexicon::english()),
+    ]);
+
+    let state = Arc::new(AppState { lexicons });
 
     let app = Router::new()
         .route("/", get(index))

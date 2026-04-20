@@ -8,7 +8,7 @@ use clap::{Parser, ValueEnum};
 
 use cwhelper::Lexicon;
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+#[derive(Clone, ValueEnum)]
 enum Language {
     English,
     Dutch,

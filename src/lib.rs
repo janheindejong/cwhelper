@@ -4,15 +4,26 @@ use std::{
     path::PathBuf,
 };
 
+use serde::Deserialize;
 use unicode_normalization::UnicodeNormalization;
+
+#[derive(PartialEq, Deserialize, Eq, Hash, Debug)]
+pub enum Language {
+    English,
+    Dutch,
+}
 
 pub struct Lexicon {
     words: Vec<String>,
+    pub language: Option<Language>,
 }
 
 impl Lexicon {
     pub fn from_words(words: Vec<String>) -> Self {
-        Lexicon { words }
+        Lexicon {
+            words,
+            language: None,
+        }
     }
 
     pub fn dutch() -> Self {
@@ -20,7 +31,10 @@ impl Lexicon {
             .split('\n')
             .map(|x| x.to_string())
             .collect();
-        Lexicon { words }
+        Lexicon {
+            words,
+            language: Some(Language::Dutch),
+        }
     }
 
     pub fn english() -> Self {
@@ -28,7 +42,10 @@ impl Lexicon {
             .split('\n')
             .map(|x| x.to_string())
             .collect();
-        Lexicon { words }
+        Lexicon {
+            words,
+            language: Some(Language::English),
+        }
     }
 
     pub fn from_file(filename: &PathBuf) -> Result<Self, io::Error> {
@@ -105,7 +122,13 @@ mod tests {
     fn simple_lexicon() -> Lexicon {
         let words = vec!["café", "carpool", "carport", "brick", "carpenter", "Carter"];
         let words = words.iter().map(|w| w.to_string()).collect();
-        Lexicon { words }
+        Lexicon::from_words(words)
+    }
+
+    #[test]
+    fn simple_lexicon_enum() {
+        let lexicon = simple_lexicon();
+        assert_eq!(lexicon.language, None)
     }
 
     #[test]
@@ -132,6 +155,12 @@ mod tests {
     }
 
     #[test]
+    fn dutch_lexicon_enum() {
+        let lexicon = Lexicon::dutch();
+        assert_eq!(lexicon.language, Some(Language::Dutch))
+    }
+
+    #[test]
     fn dutch_lexicon_has_413938_words() {
         let lexicon = Lexicon::dutch();
         assert_eq!(lexicon.words.len(), 413938);
@@ -144,6 +173,12 @@ mod tests {
         assert_eq!(matches.len(), 2);
         assert_eq!(matches[0], "actiecomedy");
         assert_eq!(matches[1], "actiecomité");
+    }
+
+    #[test]
+    fn english_lexicon_enum() {
+        let lexicon = Lexicon::english();
+        assert_eq!(lexicon.language, Some(Language::English))
     }
 
     #[test]
