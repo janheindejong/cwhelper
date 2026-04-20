@@ -16,7 +16,7 @@ impl Lexicon {
     }
 
     pub fn dutch() -> Self {
-        let words = include_str!("dutch.txt")
+        let words = include_str!("lexicons/dutch.txt")
             .split('\n')
             .map(|x| x.to_string())
             .collect();
@@ -40,10 +40,11 @@ impl Lexicon {
         Ok(Lexicon::from_words(words))
     }
 
-    pub fn find_matches(&self, target: &str) -> Vec<&String> {
+    pub fn find_matches(&self, target: &str) -> Vec<String> {
         self.words
             .iter()
             .filter(|word| target.would_match(word))
+            .map(|x| x.clone())
             .collect()
     }
 }
