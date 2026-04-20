@@ -7,7 +7,7 @@ use axum::{
 };
 use cwhelper::Lexicon;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, sync::Arc, time::Instant};
 use tracing::info;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -57,12 +57,14 @@ async fn find_matches(
     State(state): State<Arc<AppState>>,
     Query(params): Query<WordQuery>,
 ) -> Result<Json<MatchesResponse>, (StatusCode, String)> {
+    let start = Instant::now();
     let matches = state.lexicons[&params.language].find_matches(&params.word);
     info!(
-        "Found {} matches for query '{}' in {}",
+        "Extracted {} matche(s) for '{}' from {} in {:?}.",
         matches.len(),
         &params.word,
-        &params.language
+        &params.language, 
+        Instant::now() - start
     );
     Ok(Json(MatchesResponse { matches }))
 }
