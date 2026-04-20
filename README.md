@@ -1,6 +1,15 @@
 # Crossword Helper 
 
-See justfile for commands. 
+A little tool to help you when you get stuck with a crossword puzzle. 
+
+## Running 
+
+The logic can be accessed in two ways: 
+
+* *cli*: cargo run --bin cwhelper -- "t*st"
+* *web*: cargo run --bin web
+
+For more commands, see the (justfile)[./justfile].
 
 ## Requirements 
 
