@@ -9,10 +9,10 @@ lint:
 check: lint
     cargo test --lib
 
-run word="t*st": check
+run word="t*st": 
     cargo run --bin cwhelper {{word}}
 
-run-web: check
+run-web: 
     cargo watch -c -w src -w static -x 'run --bin web'
 
 build-cli: check 

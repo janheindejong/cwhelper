@@ -8,6 +8,8 @@ use axum::{
 use cwhelper::Lexicon;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
+use tracing::info;
+use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 // Shared state: load the lexicon once at startup
 struct AppState {
@@ -33,11 +35,23 @@ async fn find_matches(
     Query(params): Query<WordQuery>,
 ) -> Result<Json<MatchesResponse>, (StatusCode, String)> {
     let matches = state.lexicon.find_matches(&params.word);
+    info!("Found {} matches for query {}", matches.len(), &params.word);
     Ok(Json(MatchesResponse { matches }))
+}
+
+fn setup_logging() {
+    let file_appender = tracing_appender::rolling::daily("logs", "cwhelper.log");
+
+    tracing_subscriber::registry()
+        .with(fmt::layer().with_writer(file_appender)) // file (JSON-friendly, structured)
+        .with(fmt::layer()) // stdout (human-readable)
+        .init();
 }
 
 #[tokio::main]
 async fn main() {
+    setup_logging();
+
     let lexicon = Lexicon::dutch();
     let state = Arc::new(AppState { lexicon });
 

@@ -15,7 +15,7 @@ For more commands, see the [justfile](./justfile).
 
 For basic development: 
 
-* [Rust & Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) 
+* [Rust](https://doc.rust-lang.org/cargo/getting-started/installation.html) 
 * [Just](https://github.com/casey/just)
 
 For cross-compilation for Raspberry Pi: 
@@ -24,3 +24,7 @@ For cross-compilation for Raspberry Pi:
 sudo apt install gcc-aarch64-linux-gnu # Install cross-compilation linker
 rustup target add aarch64-unknown-linux-gnu # Register as target for the rust compiler 
 ```
+
+## Roadmap 
+
+English lexicon is on the to-do list, then we'll publish on r/crossword to see what's up. 
