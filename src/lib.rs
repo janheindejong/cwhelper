@@ -23,6 +23,14 @@ impl Lexicon {
         Lexicon { words }
     }
 
+    pub fn english() -> Self {
+        let words = include_str!("lexicons/english.txt")
+            .split('\n')
+            .map(|x| x.to_string())
+            .collect();
+        Lexicon { words }
+    }
+
     pub fn from_file(filename: &PathBuf) -> Result<Self, io::Error> {
         let reader = BufReader::new(File::open(filename)?);
 
@@ -136,5 +144,20 @@ mod tests {
         assert_eq!(matches.len(), 2);
         assert_eq!(matches[0], "actiecomedy");
         assert_eq!(matches[1], "actiecomité");
+    }
+
+    #[test]
+    fn english_lexicon_has_413938_words() {
+        let lexicon = Lexicon::english();
+        assert_eq!(lexicon.words.len(), 466551);
+    }
+
+    #[test]
+    fn english_txst_finds_4_matches() {
+        let lexicon = Lexicon::english();
+        let matches = lexicon.find_matches("t*st");
+        assert_eq!(matches.len(), 4);
+        assert_eq!(matches[0], "Test");
+        assert_eq!(matches[1], "tost");
     }
 }

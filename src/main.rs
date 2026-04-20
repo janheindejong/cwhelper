@@ -1,8 +1,18 @@
-use std::{io::stdin, path::PathBuf, process::exit};
+use std::{
+    io::{self, stdin},
+    path::PathBuf,
+    process::exit,
+};
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 
 use cwhelper::Lexicon;
+
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum Language {
+    English,
+    Dutch,
+}
 
 /// Tool to help you solve the NRC Econogram
 #[derive(Parser)]
@@ -11,37 +21,48 @@ struct Args {
     word: Option<String>,
 
     /// Optional path to lexicon file, where each line is a word
-    #[arg(short, long, value_name = "FILE")]
-    lexicon: Option<PathBuf>,
+    #[arg(long, value_name = "FILE")]
+    lexicon_file: Option<PathBuf>,
+
+    // Select language to use
+    #[arg(short, long, value_enum)]
+    language: Option<Language>,
 }
 
 fn main() {
     let args = Args::parse();
 
-    // Get target in the form 'app*l'
-    let target = match args.word {
-        Some(word) => word,
-        None => prompt_target(),
-    };
+    let (target, lexicon) = parse_args(&args).unwrap_or_else(|err| {
+        eprintln!("Error: {err}");
+        exit(1)
+    });
 
-    let lexicon = match &args.lexicon {
-        // If lexicon is passed as argument, load from file
-        Some(path) => match Lexicon::from_file(path) {
-            Ok(lexicon) => lexicon,
-            Err(err) => {
-                eprintln!("Couldn't read lexicon: {err}");
-                exit(1)
-            }
-        },
-        // By default, use Dutch lexicon
-        None => Lexicon::dutch(),
-    };
-
-    let possible_matches = lexicon.find_matches(&target);
-
-    for word in possible_matches {
+    for word in lexicon.find_matches(&target) {
         println!("{word}")
     }
+}
+
+fn parse_args(args: &Args) -> Result<(String, Lexicon), io::Error> {
+    let target = args.word.clone().unwrap_or_else(|| prompt_target());
+    let lexicon = build_lexicon(args)?;
+    Ok((target, lexicon))
+}
+
+fn build_lexicon(args: &Args) -> Result<Lexicon, io::Error> {
+    let lexicon = match &args.lexicon_file {
+        // If lexicon is passed as argument, load from file
+        Some(path) => Lexicon::from_file(path)?,
+        // Else, use built-in
+        None => match &args.language {
+            Some(language) => match language {
+                Language::Dutch => Lexicon::dutch(),
+                Language::English => Lexicon::english(),
+            },
+            // By default, use English
+            None => Lexicon::english(),
+        },
+    };
+    Ok(lexicon)
 }
 
 /// Gets the target string from the CLI
