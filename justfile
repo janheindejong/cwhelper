@@ -22,4 +22,6 @@ build-web: check
     cargo build --release --bin web --target aarch64-unknown-linux-gnu
 
 deploy-web: build-web
+    ssh janhein@{{RASPBERRYPI_HOST}} 'sudo systemctl stop cwhelper'
     scp target/aarch64-unknown-linux-gnu/release/web janhein@{{RASPBERRYPI_HOST}}:~/cwhelper/web >/dev/null
+    ssh janhein@{{RASPBERRYPI_HOST}} 'sudo systemctl start cwhelper'
