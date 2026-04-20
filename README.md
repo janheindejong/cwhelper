@@ -9,7 +9,7 @@ The logic can be accessed in two ways:
 * *cli*: cargo run --bin cwhelper -- "t*st"
 * *web*: cargo run --bin web
 
-For more commands, see the (justfile)[./justfile].
+For more commands, see the [justfile](./justfile).
 
 ## Requirements 
 
