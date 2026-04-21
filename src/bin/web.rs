@@ -53,7 +53,7 @@ async fn index() -> Html<&'static str> {
     Html(include_str!("../../static/index.html"))
 }
 
-async fn find_matches(
+async fn matches(
     State(state): State<Arc<AppState>>,
     Query(params): Query<WordQuery>,
 ) -> Result<Json<MatchesResponse>, (StatusCode, String)> {
@@ -78,23 +78,27 @@ fn setup_logging() {
         .init();
 }
 
+fn build_lexicons() -> HashMap<Language, Lexicon> {
+    HashMap::from([
+            (Language::Dutch, Lexicon::dutch()),
+            (Language::English, Lexicon::english()),
+        ])
+}
+
 #[tokio::main]
 async fn main() {
     setup_logging();
 
-    let lexicons = HashMap::from([
-        (Language::Dutch, Lexicon::dutch()),
-        (Language::English, Lexicon::english()),
-    ]);
+    let lexicons = build_lexicons();
 
     let state = Arc::new(AppState { lexicons });
 
     let app = Router::new()
         .route("/", get(index))
-        .route("/matches", get(find_matches))
+        .route("/matches", get(matches))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    println!("Listening on http://0.0.0.0:3000");
+    info!("Listening on http://0.0.0.0:3000");
     axum::serve(listener, app).await.unwrap();
 }
