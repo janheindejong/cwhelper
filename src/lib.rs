@@ -8,7 +8,6 @@ use serde::Deserialize;
 use unicode_normalization::UnicodeNormalization;
 
 #[derive(PartialEq, Deserialize, Eq, Hash, Debug)]
-
 pub struct Lexicon {
     words: Vec<String>,
 }

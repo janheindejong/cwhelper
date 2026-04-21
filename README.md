@@ -27,4 +27,4 @@ rustup target add aarch64-unknown-linux-gnu # Register as target for the rust co
 
 ## Roadmap 
 
-English lexicon is on the to-do list, then we'll publish on r/crossword to see what's up. 
+I'd like to optimize the searching algorithm a bit (using a Trie) before we publish on Reddit. I'm a bit scared that once we get traction, the thing explodes. 
