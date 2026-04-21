@@ -8,7 +8,7 @@ use axum::{
 use cwhelper::Lexicon;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc, time::Instant};
-use tracing::info;
+use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 struct AppState {
@@ -50,7 +50,13 @@ struct MatchesResponse {
 }
 
 async fn index() -> Html<&'static str> {
+    info!("Serving Dutch page");
     Html(include_str!("../../static/index.html"))
+}
+
+async fn index_en() -> Html<&'static str> {
+    info!("Serving English page");
+    Html(include_str!("../../static/index_en.html"))
 }
 
 async fn matches(
@@ -73,16 +79,17 @@ fn setup_logging() {
     let file_appender = tracing_appender::rolling::daily("logs", "cwhelper.log");
 
     tracing_subscriber::registry()
-        .with(fmt::layer().with_writer(file_appender)) // file (JSON-friendly, structured)
-        .with(fmt::layer()) // stdout (human-readable)
+        .with(fmt::layer().with_writer(file_appender))
+        .with(fmt::layer())
+        .with(LevelFilter::INFO)
         .init();
 }
 
 fn build_lexicons() -> HashMap<Language, Lexicon> {
     HashMap::from([
-            (Language::Dutch, Lexicon::dutch()),
-            (Language::English, Lexicon::english()),
-        ])
+        (Language::Dutch, Lexicon::dutch()),
+        (Language::English, Lexicon::english()),
+    ])
 }
 
 #[tokio::main]
@@ -95,6 +102,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(index))
+        .route("/en", get(index_en))
         .route("/matches", get(matches))
         .with_state(state);
 

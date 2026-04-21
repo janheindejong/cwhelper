@@ -8,22 +8,14 @@ use serde::Deserialize;
 use unicode_normalization::UnicodeNormalization;
 
 #[derive(PartialEq, Deserialize, Eq, Hash, Debug)]
-pub enum Language {
-    English,
-    Dutch,
-}
 
 pub struct Lexicon {
     words: Vec<String>,
-    pub language: Option<Language>,
 }
 
 impl Lexicon {
     pub fn from_words(words: Vec<String>) -> Self {
-        Lexicon {
-            words,
-            language: None,
-        }
+        Lexicon { words }
     }
 
     pub fn dutch() -> Self {
@@ -31,10 +23,7 @@ impl Lexicon {
             .split('\n')
             .map(|x| x.to_string())
             .collect();
-        Lexicon {
-            words,
-            language: Some(Language::Dutch),
-        }
+        Lexicon { words }
     }
 
     pub fn english() -> Self {
@@ -42,10 +31,7 @@ impl Lexicon {
             .split('\n')
             .map(|x| x.to_string())
             .collect();
-        Lexicon {
-            words,
-            language: Some(Language::English),
-        }
+        Lexicon { words }
     }
 
     pub fn from_file(filename: &PathBuf) -> Result<Self, io::Error> {
@@ -126,12 +112,6 @@ mod tests {
     }
 
     #[test]
-    fn simple_lexicon_enum() {
-        let lexicon = simple_lexicon();
-        assert_eq!(lexicon.language, None)
-    }
-
-    #[test]
     fn target_should_match() {
         let lexicon = simple_lexicon();
         let res = lexicon.find_matches("car****");
@@ -155,12 +135,6 @@ mod tests {
     }
 
     #[test]
-    fn dutch_lexicon_enum() {
-        let lexicon = Lexicon::dutch();
-        assert_eq!(lexicon.language, Some(Language::Dutch))
-    }
-
-    #[test]
     fn dutch_lexicon_has_413938_words() {
         let lexicon = Lexicon::dutch();
         assert_eq!(lexicon.words.len(), 413938);
@@ -173,12 +147,6 @@ mod tests {
         assert_eq!(matches.len(), 2);
         assert_eq!(matches[0], "actiecomedy");
         assert_eq!(matches[1], "actiecomité");
-    }
-
-    #[test]
-    fn english_lexicon_enum() {
-        let lexicon = Lexicon::english();
-        assert_eq!(lexicon.language, Some(Language::English))
     }
 
     #[test]

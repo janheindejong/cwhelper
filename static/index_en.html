@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kruiswoordhulpje</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Fraunces:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:     #1a1612;
+      --paper:   #f5f0e8;
+      --accent:  #c0392b;
+      --muted:   #8a7f72;
+      --border:  #c8bfb0;
+      --mono:    'DM Mono', monospace;
+      --serif:   'Fraunces', serif;
+
+      --pad-x:  clamp(1.25rem, 5vw, 3rem);
+      --pad-y:  clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--serif);
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    /* ── header ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: var(--pad-y) var(--pad-x);
+      display: flex;
+      align-items: baseline;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-size: clamp(1.5rem, 5vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    header h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    header p {
+      font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+      font-weight: 300;
+      color: var(--muted);
+      font-style: italic;
+      border-left: 1px solid var(--border);
+      padding-left: 1.25rem;
+    }
+
+    @media (max-width: 480px) {
+      header {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      header p {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid var(--border);
+        padding-top: 0.6rem;
+        width: 100%;
+      }
+    }
+
+    /* ── main ── */
+    main {
+      padding: var(--pad-y) var(--pad-x);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(1.5rem, 4vw, 3rem);
+      align-items: start;
+      max-width: 1100px;
+    }
+
+    @media (max-width: 640px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── input panel ── */
+    .input-panel h2 {
+      font-size: 0.7rem;
+      font-family: var(--mono);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-bottom: 1rem;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .word-input-wrap {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .word-input-wrap::before {
+      content: '›';
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      color: var(--accent);
+      pointer-events: none;
+    }
+
+    #word-input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.2rem;
+      font-family: var(--mono);
+      font-size: clamp(1rem, 4vw, 1.15rem);
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.15s;
+      letter-spacing: 0.05em;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    @media (max-width: 640px) {
+      #word-input { font-size: 1rem; }
+    }
+
+    #word-input:focus {
+      border-color: var(--ink);
+    }
+
+    #word-input::placeholder {
+      color: var(--border);
+    }
+
+    /* ── language select ── */
+    .select-wrap {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #language-select {
+      width: 100%;
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--ink);
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    #language-select:focus {
+      border-color: var(--ink);
+    }
+
+    button {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.75rem 1.75rem;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      width: 100%;
+    }
+
+    @media (min-width: 641px) {
+      button { width: auto; }
+    }
+
+    button:hover {
+      background: var(--accent);
+    }
+
+    button:disabled {
+      background: var(--border);
+      cursor: not-allowed;
+    }
+
+    /* ── results panel ── */
+    .results-panel {
+      border-left: 1px solid var(--border);
+      padding-left: clamp(1.25rem, 3vw, 3rem);
+    }
+
+    @media (max-width: 640px) {
+      main {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+      .results-panel {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        padding-left: 0;
+        padding-top: 1.25rem;
+      }
+    }
+
+    .results-panel h2 {
+      font-size: 0.7rem;
+      font-family: var(--mono);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    #status {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 1rem;
+      min-height: 1.2em;
+    }
+
+    #status.error {
+      color: var(--accent);
+    }
+
+    #results-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    #results-list li {
+      font-family: var(--mono);
+      font-size: clamp(0.9rem, 3vw, 1rem);
+      padding: 0.35rem 0;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.1s, color 0.1s;
+      letter-spacing: 0.04em;
+      animation: fadeIn 0.2s ease both;
+    }
+
+    #results-list li:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      cursor: default;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-6px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    #results-list li:nth-child(1)  { animation-delay: 0ms; }
+    #results-list li:nth-child(2)  { animation-delay: 30ms; }
+    #results-list li:nth-child(3)  { animation-delay: 60ms; }
+    #results-list li:nth-child(4)  { animation-delay: 90ms; }
+    #results-list li:nth-child(5)  { animation-delay: 120ms; }
+    #results-list li:nth-child(n+6){ animation-delay: 150ms; }
+
+    /* ── footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1rem var(--pad-x);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Crossword <em>Helper</em></h1>
+  <p>A silly little tool to help get unstuck solving a crossword puzzle</p>
+</header>
+
+<main>
+  <section class="input-panel">
+    <h2>Word</h2>
+    <p class="hint">Use * for missing letters — e.g. <strong>r*staura*t</strong> or <strong>c*fe</strong></p>
+    <div class="word-input-wrap">
+      <input
+        id="word-input"
+        type="text"
+        placeholder="sandw*ch"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+    </div>
+    <div class="select-wrap">
+      <select id="language-select">
+        <option value="English">English</option>
+        <option value="Dutch">Dutch</option>
+      </select>
+    </div>
+    <button id="search-btn">Search</button>
+  </section>
+
+  <section class="results-panel">
+    <h2>Results (<span id="result-count">0 matches</span>)</h2>
+    <p id="status">Enter a word to search.</p>
+    <ul id="results-list"></ul>
+  </section>
+</main>
+
+<footer>
+  <span>Crossword Helper</span>
+  <span id="footer-count"></span>
+</footer>
+
+<script>
+  const API_BASE = window.location.origin;
+
+  const input       = document.getElementById('word-input');
+  const langSelect  = document.getElementById('language-select');
+  const btn         = document.getElementById('search-btn');
+  const status      = document.getElementById('status');
+  const list        = document.getElementById('results-list');
+  const countEl     = document.getElementById('result-count');
+  const footerCount = document.getElementById('footer-count');
+
+  async function search() {
+    const word = input.value.trim();
+    if (!word) return;
+
+    btn.disabled = true;
+    status.className = '';
+    status.textContent = 'Searching…';
+    list.innerHTML = '';
+    countEl.textContent = '';
+    footerCount.textContent = '';
+
+    try {
+      const params = new URLSearchParams({
+        word,
+        language: langSelect.value,
+      });
+      const res = await fetch(`${API_BASE}/matches?${params}`);
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+      const { matches } = await res.json();
+
+      if (matches.length === 0) {
+        status.textContent = 'No matches found.';
+        countEl.textContent = '0 matches';
+      } else {
+        status.textContent = '';
+        matches.forEach(w => {
+          const li = document.createElement('li');
+          li.textContent = w;
+          list.appendChild(li);
+        });
+        const label = `${matches.length} match${matches.length !== 1 ? 'es' : ''}`;
+        countEl.textContent = label;
+        footerCount.textContent = label;
+      }
+    } catch (err) {
+      status.className = 'error';
+      status.textContent = `Fout: ${err.message}`;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  btn.addEventListener('click', search);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
+</script>
+
+</body>
+</html>
