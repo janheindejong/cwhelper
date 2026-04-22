@@ -5,14 +5,14 @@ use axum::{
     response::{Html, Json},
     routing::get,
 };
-use cwhelper::Lexicon;
+use cwhelper::{Lexicon, SimpleLexicon};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc, time::Instant};
 use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 struct AppState {
-    lexicons: HashMap<Language, Lexicon>,
+    lexicons: HashMap<Language, SimpleLexicon>,
 }
 
 #[derive(Deserialize, PartialEq, Eq, Hash)]
@@ -85,10 +85,10 @@ fn setup_logging() {
         .init();
 }
 
-fn build_lexicons() -> HashMap<Language, Lexicon> {
+fn build_lexicons() -> HashMap<Language, SimpleLexicon> {
     HashMap::from([
-        (Language::Dutch, Lexicon::dutch()),
-        (Language::English, Lexicon::english()),
+        (Language::Dutch, SimpleLexicon::dutch()),
+        (Language::English, SimpleLexicon::english()),
     ])
 }
 

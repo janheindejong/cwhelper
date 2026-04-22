@@ -7,14 +7,18 @@ use std::{
 use serde::Deserialize;
 use unicode_normalization::UnicodeNormalization;
 
+pub trait Lexicon {
+    fn find_matches(&self, target: &str) -> Vec<String>;
+}
+
 #[derive(PartialEq, Deserialize, Eq, Hash, Debug)]
-pub struct Lexicon {
+pub struct SimpleLexicon {
     words: Vec<String>,
 }
 
-impl Lexicon {
+impl SimpleLexicon {
     pub fn from_words(words: Vec<String>) -> Self {
-        Lexicon { words }
+        SimpleLexicon { words }
     }
 
     pub fn dutch() -> Self {
@@ -22,7 +26,7 @@ impl Lexicon {
             .split('\n')
             .map(|x| x.to_string())
             .collect();
-        Lexicon { words }
+        SimpleLexicon { words }
     }
 
     pub fn english() -> Self {
@@ -30,7 +34,7 @@ impl Lexicon {
             .split('\n')
             .map(|x| x.to_string())
             .collect();
-        Lexicon { words }
+        SimpleLexicon { words }
     }
 
     pub fn from_file(filename: &PathBuf) -> Result<Self, io::Error> {
@@ -47,10 +51,12 @@ impl Lexicon {
             })
             .collect();
 
-        Ok(Lexicon::from_words(words))
+        Ok(SimpleLexicon::from_words(words))
     }
+}
 
-    pub fn find_matches(&self, target: &str) -> Vec<String> {
+impl Lexicon for SimpleLexicon {
+    fn find_matches(&self, target: &str) -> Vec<String> {
         self.words
             .iter()
             .filter(|word| target.would_match(word))
@@ -104,10 +110,10 @@ impl StringMatching for str {
 mod tests {
     use super::*;
 
-    fn simple_lexicon() -> Lexicon {
+    fn simple_lexicon() -> SimpleLexicon {
         let words = vec!["café", "carpool", "carport", "brick", "carpenter", "Carter"];
         let words = words.iter().map(|w| w.to_string()).collect();
-        Lexicon::from_words(words)
+        SimpleLexicon::from_words(words)
     }
 
     #[test]
@@ -135,13 +141,13 @@ mod tests {
 
     #[test]
     fn dutch_lexicon_has_413938_words() {
-        let lexicon = Lexicon::dutch();
+        let lexicon = SimpleLexicon::dutch();
         assert_eq!(lexicon.words.len(), 413938);
     }
 
     #[test]
     fn dutch_actiecom_finds_2_matches() {
-        let lexicon = Lexicon::dutch();
+        let lexicon = SimpleLexicon::dutch();
         let matches = lexicon.find_matches("actiecom***");
         assert_eq!(matches.len(), 2);
         assert_eq!(matches[0], "actiecomedy");
@@ -150,13 +156,13 @@ mod tests {
 
     #[test]
     fn english_lexicon_has_413938_words() {
-        let lexicon = Lexicon::english();
+        let lexicon = SimpleLexicon::english();
         assert_eq!(lexicon.words.len(), 466551);
     }
 
     #[test]
     fn english_txst_finds_4_matches() {
-        let lexicon = Lexicon::english();
+        let lexicon = SimpleLexicon::english();
         let matches = lexicon.find_matches("t*st");
         assert_eq!(matches.len(), 4);
         assert_eq!(matches[0], "Test");
