@@ -1,7 +1,4 @@
-use std::{
-    io,
-    path::PathBuf,
-};
+use std::{io, path::PathBuf};
 
 use serde::Deserialize;
 use unicode_normalization::UnicodeNormalization;
@@ -141,5 +138,4 @@ mod tests {
         let lexicon = SimpleLexicon::dutch();
         assert_eq!(lexicon.words[0], "010")
     }
-
 }

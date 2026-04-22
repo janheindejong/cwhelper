@@ -1,5 +1,8 @@
-use std::{fs::File, io::{self, BufReader, BufRead}, path::PathBuf};
-
+use std::{
+    fs::File,
+    io::{self, BufRead, BufReader},
+    path::PathBuf,
+};
 
 pub struct Words {}
 
@@ -38,7 +41,6 @@ impl Words {
 mod tests {
     use crate::words::Words;
 
-    
     #[test]
     fn dutch_lexicon_has_413938_words() {
         assert_eq!(Words::dutch().len(), 413937);
