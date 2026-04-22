@@ -22,35 +22,19 @@ impl SimpleLexicon {
     }
 
     pub fn dutch() -> Self {
-        let words = include_str!("lexicons/dutch.txt")
-            .split('\n')
-            .map(|x| x.to_string())
-            .collect();
-        SimpleLexicon { words }
+        SimpleLexicon {
+            words: Words::dutch(),
+        }
     }
 
     pub fn english() -> Self {
-        let words = include_str!("lexicons/english.txt")
-            .split('\n')
-            .map(|x| x.to_string())
-            .collect();
-        SimpleLexicon { words }
+        SimpleLexicon {
+            words: Words::english(),
+        }
     }
 
     pub fn from_file(filename: &PathBuf) -> Result<Self, io::Error> {
-        let reader = BufReader::new(File::open(filename)?);
-
-        let words = reader
-            .lines()
-            .filter_map(|line| match line {
-                Ok(line) => Some(line),
-                Err(msg) => {
-                    eprintln!("{msg}");
-                    None
-                }
-            })
-            .collect();
-
+        let words = Words::from_file(filename)?;
         Ok(SimpleLexicon::from_words(words))
     }
 }
@@ -65,19 +49,56 @@ impl Lexicon for SimpleLexicon {
     }
 }
 
-trait StringMatching {
+struct Words {}
+
+impl Words {
+    fn english() -> Vec<String> {
+        Words::split_string(include_str!("lexicons/english.txt"))
+    }
+
+    fn dutch() -> Vec<String> {
+        Words::split_string(include_str!("lexicons/dutch.txt"))
+    }
+
+    fn from_file(filename: &PathBuf) -> Result<Vec<String>, io::Error> {
+        let reader = BufReader::new(File::open(filename)?);
+
+        let words = reader
+            .lines()
+            .filter_map(|line| match line {
+                Ok(line) => Some(line),
+                Err(msg) => {
+                    eprintln!("{msg}");
+                    None
+                }
+            })
+            .collect();
+
+        Ok(words)
+    }
+
+    fn split_string(words: &str) -> Vec<String> {
+        words.lines().map(|x| x.to_string()).collect()
+    }
+}
+
+trait StringCleaning {
     /// Removes accents etc from string, e.g. turning café into cafe
     fn strip_diacritics(&self) -> String;
+}
 
+impl StringCleaning for str {
+    fn strip_diacritics(&self) -> String {
+        self.nfd().filter(|c| c.is_ascii()).collect()
+    }
+}
+
+trait StringMatching {
     /// Checks match; e.g., c*fe would match café, but carpool would not match car
     fn would_match(&self, other: &str) -> bool;
 }
 
 impl StringMatching for str {
-    fn strip_diacritics(&self) -> String {
-        self.nfd().filter(|c| c.is_ascii()).collect()
-    }
-
     fn would_match(&self, other: &str) -> bool {
         // Prep the target & reference to make sure we also match things like é and E to e
         let target = self.to_ascii_lowercase().strip_diacritics();
@@ -142,7 +163,7 @@ mod tests {
     #[test]
     fn dutch_lexicon_has_413938_words() {
         let lexicon = SimpleLexicon::dutch();
-        assert_eq!(lexicon.words.len(), 413938);
+        assert_eq!(lexicon.words.len(), 413937);
     }
 
     #[test]
@@ -157,7 +178,7 @@ mod tests {
     #[test]
     fn english_lexicon_has_413938_words() {
         let lexicon = SimpleLexicon::english();
-        assert_eq!(lexicon.words.len(), 466551);
+        assert_eq!(lexicon.words.len(), 466550);
     }
 
     #[test]
