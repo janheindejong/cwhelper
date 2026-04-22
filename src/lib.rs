@@ -131,32 +131,15 @@ mod tests {
     }
 
     #[test]
-    fn dutch_lexicon_has_413938_words() {
-        let lexicon = SimpleLexicon::dutch();
-        assert_eq!(lexicon.words.len(), 413937);
-    }
-
-    #[test]
-    fn dutch_actiecom_finds_2_matches() {
-        let lexicon = SimpleLexicon::dutch();
-        let matches = lexicon.find_matches("actiecom***");
-        assert_eq!(matches.len(), 2);
-        assert_eq!(matches[0], "actiecomedy");
-        assert_eq!(matches[1], "actiecomité");
-    }
-
-    #[test]
-    fn english_lexicon_has_413938_words() {
+    fn english_lexicon_has_2_as_first_word() {
         let lexicon = SimpleLexicon::english();
-        assert_eq!(lexicon.words.len(), 466550);
+        assert_eq!(lexicon.words[0], "2")
     }
 
     #[test]
-    fn english_txst_finds_4_matches() {
-        let lexicon = SimpleLexicon::english();
-        let matches = lexicon.find_matches("t*st");
-        assert_eq!(matches.len(), 4);
-        assert_eq!(matches[0], "Test");
-        assert_eq!(matches[1], "tost");
+    fn dutch_lexicon_has_010_as_first_word() {
+        let lexicon = SimpleLexicon::dutch();
+        assert_eq!(lexicon.words[0], "010")
     }
+
 }

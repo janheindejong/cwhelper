@@ -33,3 +33,19 @@ impl Words {
         words.lines().map(|x| x.to_string()).collect()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::words::Words;
+
+    
+    #[test]
+    fn dutch_lexicon_has_413938_words() {
+        assert_eq!(Words::dutch().len(), 413937);
+    }
+
+    #[test]
+    fn english_lexicon_has_413938_words() {
+        assert_eq!(Words::english().len(), 466550);
+    }
+}
