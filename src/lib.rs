@@ -1,11 +1,14 @@
 use std::{
-    fs::File,
-    io::{self, BufRead, BufReader},
+    io,
     path::PathBuf,
 };
 
 use serde::Deserialize;
 use unicode_normalization::UnicodeNormalization;
+
+use crate::words::Words;
+
+mod words;
 
 pub trait Lexicon {
     fn find_matches(&self, target: &str) -> Vec<String>;
@@ -46,39 +49,6 @@ impl Lexicon for SimpleLexicon {
             .filter(|word| target.would_match(word))
             .map(|x| x.clone())
             .collect()
-    }
-}
-
-struct Words {}
-
-impl Words {
-    fn english() -> Vec<String> {
-        Words::split_string(include_str!("lexicons/english.txt"))
-    }
-
-    fn dutch() -> Vec<String> {
-        Words::split_string(include_str!("lexicons/dutch.txt"))
-    }
-
-    fn from_file(filename: &PathBuf) -> Result<Vec<String>, io::Error> {
-        let reader = BufReader::new(File::open(filename)?);
-
-        let words = reader
-            .lines()
-            .filter_map(|line| match line {
-                Ok(line) => Some(line),
-                Err(msg) => {
-                    eprintln!("{msg}");
-                    None
-                }
-            })
-            .collect();
-
-        Ok(words)
-    }
-
-    fn split_string(words: &str) -> Vec<String> {
-        words.lines().map(|x| x.to_string()).collect()
     }
 }
 
