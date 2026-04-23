@@ -1,6 +1,7 @@
+use crate::lexicon::character_normalization::CharacterNormalization;
+
 use super::Lexicon;
 use serde::Deserialize;
-use unicode_normalization::UnicodeNormalization;
 
 #[derive(PartialEq, Deserialize, Eq, Hash, Debug)]
 pub struct SimpleLexicon {
@@ -21,17 +22,6 @@ impl Lexicon for SimpleLexicon {
     }
 }
 
-trait StringCleaning {
-    /// Removes accents etc from string, e.g. turning café into cafe
-    fn strip_diacritics(&self) -> String;
-}
-
-impl StringCleaning for str {
-    fn strip_diacritics(&self) -> String {
-        self.nfd().filter(|c| c.is_ascii()).collect()
-    }
-}
-
 trait StringMatching {
     /// Checks match; e.g., c*fe would match café, but carpool would not match car
     fn would_match(&self, other: &str) -> bool;
@@ -40,8 +30,8 @@ trait StringMatching {
 impl StringMatching for str {
     fn would_match(&self, other: &str) -> bool {
         // Prep the target & reference to make sure we also match things like é and E to e
-        let target = self.to_ascii_lowercase().strip_diacritics();
-        let reference = other.to_ascii_lowercase().strip_diacritics();
+        let target = self.normalize();
+        let reference = other.normalize();
 
         // Check if same length
         if target.chars().count() != reference.chars().count() {
