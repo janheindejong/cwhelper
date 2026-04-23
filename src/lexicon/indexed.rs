@@ -34,7 +34,7 @@ impl Lexicon for IndexedLexicon {
                 // Get the node for this layer, or add an empty one
                 node = node
                     .children
-                    .entry(c.normalize())
+                    .entry(c.normalize()) // Use normalized character for indexing
                     .or_insert_with(TrieNode::new);
             }
             // Set the value of the node to the word
