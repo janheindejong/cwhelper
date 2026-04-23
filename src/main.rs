@@ -5,7 +5,7 @@ use std::{
 };
 
 use clap::{Parser, ValueEnum};
-use cwhelper::lexicon::{Lexicon, simple::SimpleLexicon, words::Words};
+use cwhelper::lexicon::{Lexicon, simple::SimpleLexicon, words};
 
 #[derive(Clone, ValueEnum)]
 enum Language {
@@ -50,15 +50,15 @@ fn parse_args(args: &Args) -> Result<(String, SimpleLexicon), io::Error> {
 fn build_lexicon(args: &Args) -> Result<SimpleLexicon, io::Error> {
     let words = match &args.lexicon_file {
         // If lexicon is passed as argument, load from file
-        Some(path) => Words::from_file(path)?,
+        Some(path) => words::from_file(path)?,
         // Else, use built-in
         None => match &args.language {
             Some(language) => match language {
-                Language::Dutch => Words::dutch(),
-                Language::English => Words::english(),
+                Language::Dutch => words::dutch(),
+                Language::English => words::english(),
             },
             // By default, use English
-            None => Words::english(),
+            None => words::english(),
         },
     };
     let lexicon = SimpleLexicon::from_words(words);

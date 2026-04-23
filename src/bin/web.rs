@@ -5,7 +5,7 @@ use axum::{
     response::{Html, Json},
     routing::get,
 };
-use cwhelper::lexicon::{Lexicon, simple::SimpleLexicon, words::Words};
+use cwhelper::lexicon::{Lexicon, simple::SimpleLexicon, words};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc, time::Instant};
 use tracing::{info, level_filters::LevelFilter};
@@ -87,10 +87,10 @@ fn setup_logging() {
 
 fn build_lexicons() -> HashMap<Language, SimpleLexicon> {
     HashMap::from([
-        (Language::Dutch, SimpleLexicon::from_words(Words::dutch())),
+        (Language::Dutch, SimpleLexicon::from_words(words::dutch())),
         (
             Language::English,
-            SimpleLexicon::from_words(Words::english()),
+            SimpleLexicon::from_words(words::english()),
         ),
     ])
 }
