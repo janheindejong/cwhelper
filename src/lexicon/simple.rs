@@ -1,7 +1,4 @@
-use std::{io, path::PathBuf};
-
-use super::FindMatches;
-use super::words::Words;
+use super::Lexicon;
 use serde::Deserialize;
 use unicode_normalization::UnicodeNormalization;
 
@@ -10,30 +7,11 @@ pub struct SimpleLexicon {
     words: Vec<String>,
 }
 
-impl SimpleLexicon {
-    pub fn from_words(words: Vec<String>) -> Self {
+impl Lexicon for SimpleLexicon {
+    fn from_words(words: Vec<String>) -> Self {
         SimpleLexicon { words }
     }
 
-    pub fn dutch() -> Self {
-        SimpleLexicon {
-            words: Words::dutch(),
-        }
-    }
-
-    pub fn english() -> Self {
-        SimpleLexicon {
-            words: Words::english(),
-        }
-    }
-
-    pub fn from_file(filename: &PathBuf) -> Result<Self, io::Error> {
-        let words = Words::from_file(filename)?;
-        Ok(SimpleLexicon::from_words(words))
-    }
-}
-
-impl FindMatches for SimpleLexicon {
     fn find_matches(&self, target: &str) -> Vec<String> {
         self.words
             .iter()
@@ -119,17 +97,5 @@ mod tests {
         let res = lexicon.find_matches("c*rtEr");
         assert_eq!(res.len(), 1);
         assert_eq!(res[0], "Carter");
-    }
-
-    #[test]
-    fn english_lexicon_has_2_as_first_word() {
-        let lexicon = SimpleLexicon::english();
-        assert_eq!(lexicon.words[0], "2")
-    }
-
-    #[test]
-    fn dutch_lexicon_has_010_as_first_word() {
-        let lexicon = SimpleLexicon::dutch();
-        assert_eq!(lexicon.words[0], "010")
     }
 }
