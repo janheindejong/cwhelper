@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use itertools::Itertools;
 
-use crate::lexicon::character_normalization::CharacterNormalization;
+use crate::lexicon::{Lexicon, character_normalization::CharacterNormalization};
 
 pub struct TrieNode<U, T> {
     value: Option<T>,
@@ -18,12 +18,12 @@ impl TrieNode<char, String> {
     }
 }
 
-pub struct IndexedLexicon<U, T> {
-    root: TrieNode<U, T>,
+pub struct IndexedLexicon {
+    root: TrieNode<char, String>,
 }
 
-impl IndexedLexicon<char, String> {
-    pub fn from_words(words: Vec<&str>) -> Self {
+impl Lexicon for IndexedLexicon {
+    fn from_words(words: Vec<String>) -> Self {
         let mut root = IndexedLexicon {
             root: TrieNode::new(),
         };
@@ -38,7 +38,7 @@ impl IndexedLexicon<char, String> {
         root
     }
 
-    pub fn find_matches(&self, target: &str) -> Vec<String> {
+    fn find_matches(&self, target: &str) -> Vec<String> {
         let target: String = target.normalize(); // Convert to lowercase and remove diacritics in target string to match against index
         let mut layer = vec![&self.root];
         // We move through the tree layer by layer
@@ -68,8 +68,13 @@ impl IndexedLexicon<char, String> {
 mod tests {
     use super::*;
 
-    fn indexed_lexicon() -> IndexedLexicon<char, String> {
-        IndexedLexicon::from_words(vec!["ab", "abc", "adc", "café", "Kensington"])
+    fn indexed_lexicon() -> IndexedLexicon {
+        IndexedLexicon::from_words(
+            vec!["ab", "abc", "adc", "café", "Kensington"]
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
+        )
     }
 
     #[test]

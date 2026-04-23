@@ -5,14 +5,14 @@ use axum::{
     response::{Html, Json},
     routing::get,
 };
-use cwhelper::lexicon::{Lexicon, simple::SimpleLexicon, words};
+use cwhelper::lexicon::{Lexicon, indexed::IndexedLexicon, words};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc, time::Instant};
 use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 struct AppState {
-    lexicons: HashMap<Language, SimpleLexicon>,
+    lexicons: HashMap<Language, IndexedLexicon>,
 }
 
 #[derive(Deserialize, PartialEq, Eq, Hash)]
@@ -85,14 +85,17 @@ fn setup_logging() {
         .init();
 }
 
-fn build_lexicons() -> HashMap<Language, SimpleLexicon> {
-    HashMap::from([
-        (Language::Dutch, SimpleLexicon::from_words(words::dutch())),
+fn build_lexicons() -> HashMap<Language, IndexedLexicon> {
+    let start = Instant::now();
+    let lexicons = HashMap::from([
+        (Language::Dutch, IndexedLexicon::from_words(words::dutch())),
         (
             Language::English,
-            SimpleLexicon::from_words(words::english()),
+            IndexedLexicon::from_words(words::english()),
         ),
-    ])
+    ]);
+    info!("Created lexicons in {:?}.", Instant::now() - start);
+    lexicons
 }
 
 #[tokio::main]
