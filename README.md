@@ -9,7 +9,7 @@
 
 ## About 
 
-I created this as a programming exercise, to see what I could do with [Rust](https://rust-lang.org). 
+I created this as an exercise to learn [Rust](https://rust-lang.org). The inspiration came from a bout of frustration trying to find the last missing words in last years' NRC Econogram. 
 
 ## Development
 
