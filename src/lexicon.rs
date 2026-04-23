@@ -1,4 +1,5 @@
 pub mod simple;
+pub mod indexed;
 pub mod words;
 
 pub trait Lexicon {
