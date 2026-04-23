@@ -5,7 +5,7 @@ use axum::{
     response::{Html, Json},
     routing::get,
 };
-use cwhelper::{Lexicon, SimpleLexicon};
+use cwhelper::lexicon::{FindMatches, simple::SimpleLexicon};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc, time::Instant};
 use tracing::{info, level_filters::LevelFilter};

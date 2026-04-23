@@ -5,8 +5,7 @@ use std::{
 };
 
 use clap::{Parser, ValueEnum};
-
-use cwhelper::{Lexicon, SimpleLexicon};
+use cwhelper::lexicon::{FindMatches, simple::SimpleLexicon};
 
 #[derive(Clone, ValueEnum)]
 enum Language {

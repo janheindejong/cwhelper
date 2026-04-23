@@ -8,11 +8,11 @@ pub struct Words {}
 
 impl Words {
     pub fn english() -> Vec<String> {
-        Words::split_string(include_str!("lexicons/english.txt"))
+        Words::split_string(include_str!("words/english.txt"))
     }
 
     pub fn dutch() -> Vec<String> {
-        Words::split_string(include_str!("lexicons/dutch.txt"))
+        Words::split_string(include_str!("words/dutch.txt"))
     }
 
     pub fn from_file(filename: &PathBuf) -> Result<Vec<String>, io::Error> {
@@ -39,7 +39,7 @@ impl Words {
 
 #[cfg(test)]
 mod tests {
-    use crate::words::Words;
+    use super::*;
 
     #[test]
     fn dutch_lexicon_has_413938_words() {
