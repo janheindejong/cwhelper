@@ -24,18 +24,18 @@ pub struct IndexedLexicon {
 
 impl Lexicon for IndexedLexicon {
     fn from_words(words: Vec<String>) -> Self {
-        let mut root = IndexedLexicon {
+        let mut lexicon = IndexedLexicon {
             root: TrieNode::new(),
         };
         for word in words {
-            let mut node = &mut root.root;
+            let mut node = &mut lexicon.root;
             for mut c in word.chars() {
                 c = c.normalize(); // Convert to lowercase and remove diacritics characters used for indexing
                 node = node.children.entry(c).or_insert_with(TrieNode::new);
             }
             node.value = Some(word.to_string());
         }
-        root
+        lexicon
     }
 
     fn find_matches(&self, target: &str) -> Vec<String> {
