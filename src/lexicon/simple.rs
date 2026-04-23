@@ -61,9 +61,8 @@ mod tests {
     use super::*;
 
     fn simple_lexicon() -> SimpleLexicon {
-        let words = vec!["café", "carpool", "carport", "brick", "carpenter", "Carter"];
-        let words = words.iter().map(|w| w.to_string()).collect();
-        SimpleLexicon::from_words(words)
+        let words = ["café", "carpool", "carport", "brick", "carpenter", "Carter"];
+        SimpleLexicon::from_words(words.map(String::from).to_vec())
     }
 
     #[test]

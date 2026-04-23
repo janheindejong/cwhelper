@@ -4,12 +4,12 @@ use itertools::Itertools;
 
 use crate::lexicon::{Lexicon, character_normalization::CharacterNormalization};
 
-pub struct TrieNode<U, T> {
-    value: Option<T>,
-    children: HashMap<U, TrieNode<U, T>>,
+pub struct TrieNode {
+    value: Option<String>,
+    children: HashMap<char, TrieNode>,
 }
 
-impl TrieNode<char, String> {
+impl TrieNode {
     fn new() -> Self {
         TrieNode {
             value: None,
@@ -19,7 +19,7 @@ impl TrieNode<char, String> {
 }
 
 pub struct IndexedLexicon {
-    root: TrieNode<char, String>,
+    root: TrieNode,
 }
 
 impl Lexicon for IndexedLexicon {
@@ -44,7 +44,7 @@ impl Lexicon for IndexedLexicon {
         // We move through the tree layer by layer
         for c in target.chars() {
             // For every layer, we build the next layer from the nodes of the previous layer
-            let mut next_layer: Vec<&TrieNode<char, String>> = vec![];
+            let mut next_layer: Vec<&TrieNode> = vec![];
             for node in layer.iter() {
                 // If character is wildcard, the next layer is composed of all children of all nodes in the current layer
                 if c == '*' {
@@ -69,12 +69,8 @@ mod tests {
     use super::*;
 
     fn indexed_lexicon() -> IndexedLexicon {
-        IndexedLexicon::from_words(
-            vec!["ab", "abc", "adc", "café", "Kensington"]
-                .iter()
-                .map(|s| s.to_string())
-                .collect(),
-        )
+        let words = ["ab", "abc", "adc", "café", "Kensington"];
+        IndexedLexicon::from_words(words.map(String::from).to_vec())
     }
 
     #[test]
