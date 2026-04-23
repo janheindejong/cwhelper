@@ -28,11 +28,15 @@ impl Lexicon for IndexedLexicon {
             root: TrieNode::new(),
         };
         for word in words {
+            // Get the node at the end of the tree, that matches the pattern of the word
             let mut node = &mut lexicon.root;
             for mut c in word.chars() {
-                c = c.normalize(); // Convert to lowercase and remove diacritics characters used for indexing
+                // Convert to lowercase and remove diacritics characters used for indexing
+                c = c.normalize();
+                // Get the node for this layer, or add an empty one
                 node = node.children.entry(c).or_insert_with(TrieNode::new);
             }
+            // Set the value of the node to the word
             node.value = Some(word.to_string());
         }
         lexicon
@@ -40,22 +44,26 @@ impl Lexicon for IndexedLexicon {
 
     fn find_matches(&self, target: &str) -> Vec<String> {
         let target: String = target.normalize(); // Convert to lowercase and remove diacritics in target string to match against index
+        // The algorithm moves through the tree in layers matching the characters of the target,
+        // gathering all nodes that match the pattern up to that point.
         let mut layer = vec![&self.root];
-        // We move through the tree layer by layer
         for c in target.chars() {
-            // For every layer, we build the next layer from the nodes of the previous layer
+            // For every layer, we iterate over the nodes of the previous layer, and use them to
+            // populate the next layer.
             let mut next_layer: Vec<&TrieNode> = vec![];
             for node in layer.iter() {
-                // If character is wildcard, the next layer is composed of all children of all nodes in the current layer
+                // When a character is wildcard, all children of the node are added to the next layer
                 if c == '*' {
                     next_layer.extend(node.children.values());
-                } else if let Some(layer_node) = node.children.get(&c) {
+                }
+                // Otherwise we try to see if the node has children for the given character, and add them to the layer.
+                else if let Some(layer_node) = node.children.get(&c) {
                     next_layer.push(layer_node);
                 }
             }
             layer = next_layer;
         }
-        // We extract the values from all the nodes in the final layer
+        // Finally, we extract the values from all the nodes in the final layer and return them
         layer
             .iter()
             .filter_map(|n| n.value.clone())
