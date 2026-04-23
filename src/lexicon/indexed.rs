@@ -30,9 +30,12 @@ impl Lexicon for IndexedLexicon {
         for word in words {
             // Get the node at the end of the tree, that matches the pattern of the word
             let mut node = &mut lexicon.root;
-            for c in word.normalize().chars() {
+            for c in word.chars() {
                 // Get the node for this layer, or add an empty one
-                node = node.children.entry(c).or_insert_with(TrieNode::new);
+                node = node
+                    .children
+                    .entry(c.normalize())
+                    .or_insert_with(TrieNode::new);
             }
             // Set the value of the node to the word
             node.value = Some(word.to_string());
