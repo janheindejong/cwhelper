@@ -41,18 +41,19 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-
     let mut writer = stdout();
     let res = run(args, &mut writer);
-    if let Err(msg) = res {
-        println!("{}", msg);
+    if let io::Result::Err(msg) = res {
+        eprintln!("Error reading lexicon file: {}", msg);
+        exit(1)
+    } else if let Err(msg) = res {
+        eprintln!("Unknown error: {}", msg);
         exit(1)
     };
 }
 
 fn run(args: Args, writer: &mut impl Write) -> io::Result<()> {
     let (target, lexicon) = parse_args(&args)?;
-
     for word in lexicon.find_matches(&target) {
         writeln!(writer, "{word}")?;
     }
