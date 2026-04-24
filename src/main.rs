@@ -98,7 +98,7 @@ mod tests {
             lexicon_file: None, 
             language: None
         };
-        let mut writer: Vec<u8> = Vec::new();
+        let mut writer = Vec::new();
         let res = run(args, &mut writer);
         let output = String::from_utf8(writer).unwrap();
         assert!(res.is_ok());
