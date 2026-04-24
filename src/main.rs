@@ -1,7 +1,4 @@
-use std::{
-    io::{self, stdin},
-    path::PathBuf,
-    process::exit,
+use std::{io::{self, stdin, stdout, Write}, path::PathBuf, process::exit
 };
 
 use clap::{Parser, ValueEnum};
@@ -42,14 +39,21 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let (target, lexicon) = parse_args(&args).unwrap_or_else(|err| {
-        eprintln!("Error: {err}");
+    let mut writer = stdout();
+    let res = run(args, &mut writer);
+    if let Err(msg) = res {
+        println!("{}", msg);
         exit(1)
-    });
+    };
+}
+
+fn run(args: Args, writer: &mut impl Write) -> io::Result<()>{
+    let (target, lexicon) = parse_args(&args)?;
 
     for word in lexicon.find_matches(&target) {
-        println!("{word}")
+        writeln!(writer, "{word}")?;
     }
+    Ok(())
 }
 
 fn parse_args(args: &Args) -> Result<(String, SimpleLexicon), io::Error> {
@@ -80,5 +84,24 @@ fn prompt_target() -> String {
             continue;
         }
         break input.trim().to_string();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_run() {
+        let args = Args {
+            word: Some("t*st".to_string()), 
+            lexicon_file: None, 
+            language: None
+        };
+        let mut writer: Vec<u8> = Vec::new();
+        let res = run(args, &mut writer);
+        let output = String::from_utf8(writer).unwrap();
+        assert!(res.is_ok());
+        assert_eq!(output, "Test\ntost\nTrst\nTSST\n");
     }
 }
