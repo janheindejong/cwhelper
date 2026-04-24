@@ -1,4 +1,5 @@
 RASPBERRYPI_HOST := "192.168.2.21"
+WINDOWS_PATH := "/mnt/c/Users/JanHeindeJong/.local/bin"
 
 fmt: 
     cargo fmt
@@ -15,13 +16,17 @@ run word="t*st":
 run-web: 
     cargo watch -c -w src -w static -x 'run --bin web'
 
-build-cli: check 
-    cargo build --release --bin cwhelper
+build-cli target="": check 
+    cargo build --release --bin cwhelper {{ if target != "" { "--target " + target } else { "" } }}
 
-build-web: check
-    cargo build --release --bin web --target aarch64-unknown-linux-gnu
+build-web target="": check
+    cargo build --release --bin web {{ if target != "" { "--target " + target } else { "" } }}
 
-deploy-web: build-web
+deploy-to-pi: (build-web "aarch64-unknown-linux-gnu")
     ssh janhein@{{RASPBERRYPI_HOST}} 'sudo systemctl stop cwhelper'
     scp target/aarch64-unknown-linux-gnu/release/web janhein@{{RASPBERRYPI_HOST}}:~/cwhelper/web >/dev/null
     ssh janhein@{{RASPBERRYPI_HOST}} 'sudo systemctl start cwhelper'
+
+deploy-to-windows: (build-cli "x86_64-pc-windows-gnu") (build-web "x86_64-pc-windows-gnu")
+    cp target/x86_64-pc-windows-gnu/release/web.exe {{WINDOWS_PATH}}/cwhelper-web.exe
+    cp target/x86_64-pc-windows-gnu/release/cwhelper.exe {{WINDOWS_PATH}}/cwhelper.exe

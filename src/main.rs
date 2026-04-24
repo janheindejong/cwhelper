@@ -7,10 +7,21 @@ use std::{
 use clap::{Parser, ValueEnum};
 use cwhelper::lexicon::{Lexicon, simple::SimpleLexicon, words};
 
-#[derive(Clone, ValueEnum)]
+#[derive(Clone, ValueEnum, Copy)]
 enum Language {
     English,
     Dutch,
+    Italian,
+}
+
+impl Language {
+    fn words(&self) -> Vec<String> {
+        match self {
+            Language::Dutch => words::dutch(),
+            Language::English => words::english(),
+            Language::Italian => words::italian(),
+        }
+    }
 }
 
 /// Tool to help you solve the NRC Econogram
@@ -52,14 +63,7 @@ fn build_lexicon(args: &Args) -> Result<SimpleLexicon, io::Error> {
         // If lexicon is passed as argument, load from file
         Some(path) => words::from_file(path)?,
         // Else, use built-in
-        None => match &args.language {
-            Some(language) => match language {
-                Language::Dutch => words::dutch(),
-                Language::English => words::english(),
-            },
-            // By default, use English
-            None => words::english(),
-        },
+        None => args.language.unwrap_or(Language::English).words(),
     };
     let lexicon = SimpleLexicon::from_words(words);
     Ok(lexicon)

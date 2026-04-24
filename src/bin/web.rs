@@ -15,19 +15,20 @@ struct AppState {
     lexicons: HashMap<Language, IndexedLexicon>,
 }
 
-#[derive(Deserialize, PartialEq, Eq, Hash)]
+#[derive(Deserialize, PartialEq, Eq, Hash, Clone, Copy, Debug)]
 enum Language {
     English,
     Dutch,
+    Italian,
 }
 
-impl std::fmt::Display for Language {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = match self {
-            Language::Dutch => "Dutch",
-            Language::English => "English",
-        };
-        write!(f, "{s}")
+impl Language {
+    fn words(&self) -> Vec<String> {
+        match self {
+            Language::Dutch => words::dutch(),
+            Language::English => words::english(),
+            Language::Italian => words::italian(),
+        }
     }
 }
 
@@ -66,7 +67,7 @@ async fn matches(
     let start = Instant::now();
     let matches = state.lexicons[&params.language].find_matches(&params.word);
     info!(
-        "Extracted {} matche(s) for '{}' from {} in {:?}.",
+        "Extracted {} matche(s) for '{}' from {:?} in {:?}.",
         matches.len(),
         &params.word,
         &params.language,
@@ -86,15 +87,18 @@ fn setup_logging() {
 }
 
 fn build_lexicons() -> HashMap<Language, IndexedLexicon> {
-    let start = Instant::now();
-    let lexicons = HashMap::from([
-        (Language::Dutch, IndexedLexicon::from_words(words::dutch())),
-        (
-            Language::English,
-            IndexedLexicon::from_words(words::english()),
-        ),
-    ]);
-    info!("Created lexicons in {:?}.", Instant::now() - start);
+    let mut lexicons = HashMap::new();
+    let languages = [Language::Dutch, Language::English, Language::Italian];
+    for language in languages {
+        let start = Instant::now();
+        let lexicon = IndexedLexicon::from_words(language.words());
+        info!(
+            "Created {:?} lexicon in {:?}.",
+            language,
+            Instant::now() - start
+        );
+        lexicons.insert(language, lexicon);
+    }
     lexicons
 }
 

@@ -27,7 +27,7 @@ impl Lexicon for IndexedLexicon {
         let mut lexicon = IndexedLexicon {
             root: TrieNode::new(),
         };
-        for word in words {
+        for word in &words {
             // Get the node at the end of the tree, that matches the pattern of the word
             let mut node = &mut lexicon.root;
             for c in word.chars() {

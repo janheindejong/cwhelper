@@ -12,6 +12,10 @@ pub fn dutch() -> Vec<String> {
     split_string(include_str!("words/dutch.txt"))
 }
 
+pub fn italian() -> Vec<String> {
+    split_string(include_str!("words/italian.txt"))
+}
+
 pub fn from_file(filename: &PathBuf) -> Result<Vec<String>, io::Error> {
     let reader = BufReader::new(File::open(filename)?);
 
@@ -38,12 +42,17 @@ mod tests {
     use super::*;
 
     #[test]
-    fn dutch_lexicon_has_413938_words() {
+    fn dutch_has_413938_words() {
         assert_eq!(dutch().len(), 413937);
     }
 
     #[test]
-    fn english_lexicon_has_413938_words() {
+    fn english_has_466550_words() {
         assert_eq!(english().len(), 466550);
+    }
+
+    #[test]
+    fn italian_has_95152_words() {
+        assert_eq!(italian().len(), 95152);
     }
 }
