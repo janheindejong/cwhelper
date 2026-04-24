@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{self, BufRead, BufReader},
+    io::{self, BufReader, Read},
     path::PathBuf,
 };
 
@@ -17,19 +17,10 @@ pub fn italian() -> Vec<String> {
 }
 
 pub fn from_file(filename: &PathBuf) -> Result<Vec<String>, io::Error> {
-    let reader = BufReader::new(File::open(filename)?);
-
-    let words = reader
-        .lines()
-        .filter_map(|line| match line {
-            Ok(line) => Some(line),
-            Err(msg) => {
-                eprintln!("{msg}");
-                None
-            }
-        })
-        .collect();
-
+    let mut reader = BufReader::new(File::open(filename)?);
+    let mut s = String::new();
+    reader.read_to_string(&mut s)?;
+    let words = split_string(&s);
     Ok(words)
 }
 
