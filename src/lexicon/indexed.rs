@@ -45,7 +45,7 @@ impl Lexicon for IndexedLexicon {
 
     fn find_matches(&self, target: &str) -> Vec<String> {
         // Convert to lowercase and remove diacritics in target string to match against index
-        let target: String = target.normalize(); 
+        let target: String = target.normalize();
         // The algorithm moves through the tree in layers matching the characters of the target,
         // gathering all nodes that match the pattern up to that point.
         let mut layer = vec![&self.root];

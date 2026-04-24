@@ -8,7 +8,7 @@ lint:
     cargo fmt --check
 
 check: lint
-    cargo test --lib
+    cargo test
 
 run word="t*st": 
     cargo run --bin cwhelper {{word}}

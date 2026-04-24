@@ -1,4 +1,7 @@
-use std::{io::{self, stdin, stdout, Write}, path::PathBuf, process::exit
+use std::{
+    io::{self, Write, stdin, stdout},
+    path::PathBuf,
+    process::exit,
 };
 
 use clap::{Parser, ValueEnum};
@@ -47,7 +50,7 @@ fn main() {
     };
 }
 
-fn run(args: Args, writer: &mut impl Write) -> io::Result<()>{
+fn run(args: Args, writer: &mut impl Write) -> io::Result<()> {
     let (target, lexicon) = parse_args(&args)?;
 
     for word in lexicon.find_matches(&target) {
@@ -94,9 +97,9 @@ mod tests {
     #[test]
     fn test_run() {
         let args = Args {
-            word: Some("t*st".to_string()), 
-            lexicon_file: None, 
-            language: None
+            word: Some("t*st".to_string()),
+            lexicon_file: None,
+            language: None,
         };
         let mut writer = Vec::new();
         let res = run(args, &mut writer);
