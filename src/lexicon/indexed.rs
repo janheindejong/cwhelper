@@ -44,7 +44,8 @@ impl Lexicon for IndexedLexicon {
     }
 
     fn find_matches(&self, target: &str) -> Vec<String> {
-        let target: String = target.normalize(); // Convert to lowercase and remove diacritics in target string to match against index
+        // Convert to lowercase and remove diacritics in target string to match against index
+        let target: String = target.normalize(); 
         // The algorithm moves through the tree in layers matching the characters of the target,
         // gathering all nodes that match the pattern up to that point.
         let mut layer = vec![&self.root];
@@ -57,11 +58,12 @@ impl Lexicon for IndexedLexicon {
                 if c == '*' {
                     next_layer.extend(node.children.values());
                 }
-                // Otherwise we try to see if the node has children for the given character, and add them to the layer.
+                // Otherwise we add the child node for the given character to the next layer (if there is one)
                 else if let Some(layer_node) = node.children.get(&c) {
                     next_layer.push(layer_node);
                 }
             }
+            // Next, we repeat the process for the layer we just assembled
             layer = next_layer;
         }
         // Finally, we extract the values from all the nodes in the final layer and return them
