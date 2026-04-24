@@ -51,12 +51,12 @@ struct MatchesResponse {
 }
 
 async fn index() -> Html<&'static str> {
-    info!("Serving Dutch page");
+    info!("Serving Dutch page.");
     Html(include_str!("../../static/index.html"))
 }
 
 async fn index_en() -> Html<&'static str> {
-    info!("Serving English page");
+    info!("Serving English page.");
     Html(include_str!("../../static/index_en.html"))
 }
 
@@ -67,7 +67,7 @@ async fn matches(
     let start = Instant::now();
     let matches = state.lexicons[&params.language].find_matches(&params.word);
     info!(
-        "Extracted {} matche(s) for '{}' from {:?} in {:?}.",
+        "Found {} matche(s) for '{}' from {:?} in {:?}.",
         matches.len(),
         &params.word,
         &params.language,
