@@ -23,9 +23,9 @@ build-web target="": check
     cargo build --release --bin web {{ if target != "" { "--target " + target } else { "" } }}
 
 deploy-to-pi: (build-web "aarch64-unknown-linux-gnu")
-    ssh janhein@{{RASPBERRYPI_HOST}} 'sudo systemctl stop cwhelper'
+    ssh janhein@{{RASPBERRYPI_HOST}} 'sudo /bin/systemctl stop cwhelper'
     scp target/aarch64-unknown-linux-gnu/release/web janhein@{{RASPBERRYPI_HOST}}:~/cwhelper/web >/dev/null
-    ssh janhein@{{RASPBERRYPI_HOST}} 'sudo systemctl start cwhelper'
+    ssh janhein@{{RASPBERRYPI_HOST}} 'sudo /bin/systemctl start cwhelper'
 
 deploy-to-windows: (build-cli "x86_64-pc-windows-gnu") (build-web "x86_64-pc-windows-gnu")
     cp target/x86_64-pc-windows-gnu/release/web.exe {{WINDOWS_PATH}}/cwhelper-web.exe

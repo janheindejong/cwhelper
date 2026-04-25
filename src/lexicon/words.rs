@@ -43,7 +43,7 @@ mod tests {
     }
 
     #[test]
-    fn italian_has_95152_words() {
-        assert_eq!(italian().len(), 95152);
+    fn italian_has_661563_words() {
+        assert_eq!(italian().len(), 661563);
     }
 }
