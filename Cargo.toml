@@ -8,6 +8,7 @@ axum = "0.8.9"
 clap = { version = "4.6.0", features = ["derive"] }
 itertools = "0.14.0"
 serde = { version = "1.0.228", features = ["derive"] }
+thiserror = "2.0.18"
 tokio = { version = "1.52.1", features = ["rt", "macros", "full"] }
 tracing = "0.1.44"
 tracing-appender = "0.2.5"

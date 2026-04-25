@@ -16,7 +16,7 @@ pub fn italian() -> Vec<String> {
     split_string(include_str!("words/italian.txt"))
 }
 
-pub fn from_file(filename: &PathBuf) -> Result<Vec<String>, io::Error> {
+pub fn from_file(filename: &PathBuf) -> io::Result<Vec<String>> {
     let mut reader = BufReader::new(File::open(filename)?);
     let mut s = String::new();
     reader.read_to_string(&mut s)?;
